@@ -1,0 +1,12 @@
+{
+    "name": "sivakumar",
+    "age": 25,
+    "city": "chennai",
+    "value": null,
+    "is_nothing": true,
+    "hobbies": [
+        "coding",
+        "reading",
+        "sports"
+    ]
+}
