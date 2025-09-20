@@ -1,0 +1,38 @@
+Unlock Multi-Agent Collaboration with Agno
+
+What is Agno?
+Agno is an open-source framework for building AI agents that can think, remember, use tools, and work together. It’s model-agnostic (works with many LLMs), lightweight, and fast.
+
+Core Architecture
+Agent – main unit, powered by an LLM + instructions + tools.
+Tools – external APIs (search, finance, etc.) agents can call.
+Memory & Storage – remembers past interactions or sessions.
+Knowledge (RAG) – fetches info from documents or databases.
+Structured Output – returns data in JSON/tables, not just text.
+Multi-Agent / Workflows – several agents can collaborate on tasks.
+Monitoring – dashboards, logs, and performance tracking.
+
+Levels of Systems (simple to complex)
+Basic agent with tools.
+Add knowledge (documents).
+Add memory (context, reasoning).
+Teams of agents.
+Full workflows with state and determinism.
+
+Key Features
+Works with different AI models (not locked in).
+Handles text, images, audio, video (multi-modal).
+Remembers user history (personalization).
+Can reference stored course materials (RAG).
+Outputs structured results (e.g., quizzes).
+Agents can collaborate in workflows.
+Monitoring for debugging and scaling.
+
+
+Testing Considerations
+Tool or model failures.
+Memory accuracy and data privacy.
+Consistency (esp. grading/assessments).
+Performance with many users.
+Output format validation.
+Edge cases (bad inputs, multimodal failures).

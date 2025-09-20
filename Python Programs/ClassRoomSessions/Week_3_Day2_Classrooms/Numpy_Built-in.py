@@ -19,7 +19,7 @@ print("Every alternate test time:", execution_times[::2])
 
 #4.Iteration
 print("\nIteration:")
-for i, t in enumerate(execution_times, 1):
+for i, t in enumerate(execution_times,1):
     print(f"Test {i} execution time: {t} seconds")
 
 #5.Reshaping
