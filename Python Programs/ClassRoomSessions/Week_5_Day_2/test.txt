@@ -1,0 +1,56 @@
+Week1
+Week2
+Week3
+Week4
+Day
+1000
+4000
+5000
+6000
+Mon
+2000
+5000
+6000
+5000
+Tue
+3000
+2500
+4500
+2900
+Wed
+5000
+4500
+3500
+4500
+Thu
+7000
+3500
+2000
+3500
+Fri
+8000
+5000
+6000
+4500
+Sat
+6700
+5600
+4800
+4500
+Sun
+
+
+Line, bar, hist  using pandas plot
+
+
+Draw pie diagram  with dataframes for the foll
+
+{'Module':['AI', 'ML', 'Python', 'DataStructures'], 'Teamsize':[135, 125, 125, 115] }
+
+data = {
+    "Day": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "Week1": [1000, 2000, 3000, 5000, 7000, 8000, 6700],
+    "Week2": [4000, 5000, 2500, 4500, 3500, 5000, 5600],
+    "Week3": [5000, 6000, 4500, 3500, 2000, 6000, 4800],
+    "Week4": [6000, 5000, 2900, 4500, 3500, 4500, 4500]
+}
