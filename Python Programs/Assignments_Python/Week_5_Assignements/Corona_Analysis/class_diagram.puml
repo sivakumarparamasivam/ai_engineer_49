@@ -1,0 +1,88 @@
+@startuml Covid19AnalysisPipeline
+
+' Style configurations
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+' Main Pipeline Class
+class CovidAnalysisPipeline {
+    - csv_manager: CSVManager
+    - data: pd.DataFrame
+    - cleaner: DataCleaner
+    - analyzer: DataAnalysis
+    - visualizer: DataVisualization
+    - results: Dict[str, Any]
+    + load_csv(filepath: str): CovidAnalysisPipeline
+    + initialize_components(): CovidAnalysisPipeline
+    + run_analysis(): pd.DataFrame
+}
+
+' CSV Manager Class
+class CSVManager {
+    - file_history: List[Dict]
+    + read_csv(filepath: str): pd.DataFrame
+    + write_csv(df: pd.DataFrame, filepath: str): None
+    + get_file_info(filepath: str): Dict[str, Any]
+}
+
+' Data Cleaner Class
+class DataCleaner {
+    - data: pd.DataFrame
+    - original_data: pd.DataFrame
+    - cleaning_log: List[str]
+    + handle_missing_values(): DataCleaner
+    + remove_duplicates(): DataCleaner
+    + standardize_columns(column_mapping: Dict): DataCleaner
+    + get_cleaning_report(): str
+    + get_data(): pd.DataFrame
+}
+
+' Data Analysis Class
+class DataAnalysis {
+    - data: pd.DataFrame
+    + get_basic_stats(): Dict[str, Any]
+    + get_regional_summary(): pd.DataFrame
+    + get_top_countries(metric: str): pd.DataFrame
+    + calculate_rates(): pd.DataFrame
+}
+
+' Data Visualization Class
+class DataVisualization {
+    - data: pd.DataFrame
+    + plot_distribution(column: str): plt.Figure
+    + plot_correlation_heatmap(): plt.Figure
+    + plot_scatter(x: str, y: str): plt.Figure
+    + plot_bar_chart(x: str, y: str): plt.Figure
+    + plot_line_chart(x: str, y: Union[str, List]): plt.Figure
+    + plot_multiple_distributions(columns: List): plt.Figure
+}
+
+' External Dependencies
+class "pandas.DataFrame" as PandasDF {
+}
+
+' Relationships
+CovidAnalysisPipeline o-- CSVManager : uses >
+CovidAnalysisPipeline o-- DataCleaner : uses >
+CovidAnalysisPipeline o-- DataAnalysis : uses >
+CovidAnalysisPipeline o-- DataVisualization : uses >
+CovidAnalysisPipeline *-- PandasDF : contains >
+
+CSVManager ..> PandasDF : creates/reads >
+DataCleaner *-- PandasDF : processes >
+DataAnalysis *-- PandasDF : analyzes >
+DataVisualization *-- PandasDF : visualizes >
+
+' Flow Description
+note bottom of CovidAnalysisPipeline
+  Flow:
+  1. Pipeline loads data using CSVManager
+  2. Data is cleaned using DataCleaner
+  3. Analysis performed using DataAnalysis
+  4. Results visualized using DataVisualization
+end note
+
+@enduml
