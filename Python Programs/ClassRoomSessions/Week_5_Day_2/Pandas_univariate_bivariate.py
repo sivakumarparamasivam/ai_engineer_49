@@ -31,3 +31,7 @@ print("\nMultivariate Analysis: Module vs Status vs Defects (Total Defects):")
 module_status_defects = df.groupby(["Module", "Status"])["Defects"].sum()
 print(module_status_defects)
 print("#################################")
+
+# customer.service@hdfc.com
+
+
