@@ -1,0 +1,6 @@
+data = {
+    'Pulserate': [20, 90, 70, 60, np.nan],
+    'Hours': [85, 95, 75, 65, 70],
+    'Duration': [1, np.nan, 2, 3, 2],
+    'Sleep': [10, 12, np.nan, 8, 8]
+}
