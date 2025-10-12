@@ -1,208 +1,68 @@
-from matplotlib import pyplot as plt
-import pandas as pd
+import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
-from typing import Optional, List, Union
-
+import pandas as pd
+import os
 
 class DataVisualization:
-    """Comprehensive data visualization suite"""
+    """Basic visualization tools for COVID-19 data analysis"""
     
     def __init__(self, data: pd.DataFrame):
         self.data = data
         self._setup_style()
     
     def _setup_style(self):
-        """Setup matplotlib style"""
+        """Setup basic plot style"""
         plt.style.use('seaborn-v0_8-darkgrid')
-        sns.set_palette("husl")
         plt.rcParams['figure.figsize'] = (12, 6)
         plt.rcParams['font.size'] = 10
     
-    def plot_distribution(self, column: str, plot_type: str = 'hist',
-                         bins: int = 30, kde: bool = True,
-                         save_path: Optional[str] = None) -> plt.Figure:
-        """
-        Plot distribution of a column
-        
-        Args:
-            column: Column name
-            plot_type: 'hist', 'box', 'violin', 'kde'
-            bins: Number of bins for histogram
-            kde: Show KDE overlay for histogram
-            save_path: Path to save figure
-        """
-        fig, ax = plt.subplots(figsize=(10, 6))
-        
-        if plot_type == 'hist':
-            self.data[column].hist(bins=bins, ax=ax, alpha=0.7, edgecolor='black')
-            if kde:
-                self.data[column].plot(kind='kde', ax=ax, secondary_y=True, color='red', linewidth=2)
-            ax.set_ylabel('Frequency')
-        
-        elif plot_type == 'box':
-            self.data.boxplot(column=column, ax=ax)
-            ax.set_ylabel('Value')
-        
-        elif plot_type == 'violin':
-            sns.violinplot(data=self.data, y=column, ax=ax)
-        
-        elif plot_type == 'kde':
-            self.data[column].plot(kind='kde', ax=ax, linewidth=2)
-            ax.set_ylabel('Density')
-        
-        ax.set_xlabel(column)
-        ax.set_title(f'Distribution of {column}', fontsize=14, fontweight='bold')
-        ax.grid(True, alpha=0.3)
-        plt.tight_layout()
+    def plot_top_countries(self, metric: str = 'Confirmed', top_n: int = 10, save_path: str = None):
+        """Plot top N countries by given metric"""
+        plt.figure(figsize=(12, 6))
+        data = self.data.nlargest(top_n, metric)
+        sns.barplot(x=metric, y='Country/Region', data=data)
+        plt.title(f'Top {top_n} Countries by {metric} Cases')
         
         if save_path:
-            fig.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"✓ Saved: {save_path}")
-        
-        return fig
+            plt.savefig(save_path)
+            print(f"Saved plot to {save_path}")
+        plt.close()
     
-    def plot_correlation_heatmap(self, columns: Optional[List[str]] = None,
-                                method: str = 'pearson',
-                                annot: bool = True,
-                                save_path: Optional[str] = None) -> plt.Figure:
-        """Plot correlation heatmap"""
-        cols = columns if columns else self.data.select_dtypes(include=[np.number]).columns
-        corr = self.data[cols].corr(method=method)
-        
-        fig, ax = plt.subplots(figsize=(12, 10))
-        sns.heatmap(corr, annot=annot, cmap='coolwarm', center=0,
-                   square=True, linewidths=1, cbar_kws={"shrink": 0.8},
-                   fmt='.2f', ax=ax)
-        ax.set_title(f'Correlation Heatmap ({method.capitalize()})', 
-                    fontsize=14, fontweight='bold', pad=20)
-        plt.tight_layout()
+    def plot_correlation_heatmap(self, save_path: str = None):
+        """Plot correlation heatmap of main metrics"""
+        plt.figure(figsize=(10, 8))
+        corr = self.data[['Confirmed', 'Deaths', 'Recovered']].corr()
+        sns.heatmap(corr, annot=True, cmap='coolwarm')
+        plt.title('Correlation between COVID-19 Metrics')
         
         if save_path:
-            fig.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"✓ Saved: {save_path}")
-        
-        return fig
+            plt.savefig(save_path)
+            print(f"Saved plot to {save_path}")
+        plt.close()
     
-    def plot_scatter(self, x: str, y: str, hue: Optional[str] = None,
-                    size: Optional[str] = None, alpha: float = 0.6,
-                    save_path: Optional[str] = None) -> plt.Figure:
-        """Plot scatter plot with optional hue and size"""
-        fig, ax = plt.subplots(figsize=(10, 6))
-        
-        if hue:
-            for category in self.data[hue].unique():
-                mask = self.data[hue] == category
-                ax.scatter(self.data.loc[mask, x], self.data.loc[mask, y],
-                          label=category, alpha=alpha, s=100)
-            ax.legend(title=hue)
-        else:
-            ax.scatter(self.data[x], self.data[y], alpha=alpha, s=100)
-        
-        ax.set_xlabel(x, fontsize=12)
-        ax.set_ylabel(y, fontsize=12)
-        ax.set_title(f'{y} vs {x}', fontsize=14, fontweight='bold')
-        ax.grid(True, alpha=0.3)
-        plt.tight_layout()
+    def plot_deaths_by_region(self, save_path: str = None):
+        """Plot pie chart of deaths by region"""
+        plt.figure(figsize=(12, 8))
+        deaths_by_region = self.data.groupby('WHO Region')['Deaths'].sum()
+        plt.pie(deaths_by_region, labels=deaths_by_region.index, autopct='%1.1f%%')
+        plt.title('Distribution of Deaths by Region')
         
         if save_path:
-            fig.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"✓ Saved: {save_path}")
-        
-        return fig
+            plt.savefig(save_path)
+            print(f"Saved plot to {save_path}")
+        plt.close()
     
-    def plot_bar_chart(self, x: str, y: str, 
-                      horizontal: bool = False,
-                      top_n: Optional[int] = None,
-                      save_path: Optional[str] = None) -> plt.Figure:
-        """Plot bar chart"""
-        data = self.data.copy()
+    def plot_recovery_rates(self, top_n: int = 10, save_path: str = None):
+        """Plot recovery rates for top N countries"""
+        plt.figure(figsize=(12, 6))
+        recovery_rates = (self.data['Recovered'] / self.data['Confirmed'] * 100).round(2)
+        self.data['Recovery_Rate'] = recovery_rates
+        data = self.data.nlargest(top_n, 'Recovery_Rate')
         
-        if top_n:
-            data = data.nlargest(top_n, y)
-        
-        fig, ax = plt.subplots(figsize=(12, 6))
-        
-        if horizontal:
-            ax.barh(data[x], data[y], alpha=0.7)
-            ax.set_xlabel(y, fontsize=12)
-            ax.set_ylabel(x, fontsize=12)
-        else:
-            ax.bar(data[x], data[y], alpha=0.7)
-            ax.set_xlabel(x, fontsize=12)
-            ax.set_ylabel(y, fontsize=12)
-            plt.xticks(rotation=45, ha='right')
-        
-        ax.set_title(f'{y} by {x}', fontsize=14, fontweight='bold')
-        ax.grid(True, alpha=0.3, axis='y' if not horizontal else 'x')
-        plt.tight_layout()
+        sns.barplot(x='Recovery_Rate', y='Country/Region', data=data)
+        plt.title(f'Top {top_n} Countries by Recovery Rate')
         
         if save_path:
-            fig.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"✓ Saved: {save_path}")
-        
-        return fig
-    
-    def plot_line_chart(self, x: str, y: Union[str, List[str]],
-                       hue: Optional[str] = None,
-                       markers: bool = True,
-                       save_path: Optional[str] = None) -> plt.Figure:
-        """Plot line chart"""
-        fig, ax = plt.subplots(figsize=(12, 6))
-        
-        y_cols = [y] if isinstance(y, str) else y
-        
-        if hue:
-            for category in self.data[hue].unique():
-                mask = self.data[hue] == category
-                for y_col in y_cols:
-                    ax.plot(self.data.loc[mask, x], self.data.loc[mask, y_col],
-                           marker='o' if markers else None, 
-                           label=f'{category} - {y_col}')
-        else:
-            for y_col in y_cols:
-                ax.plot(self.data[x], self.data[y_col],
-                       marker='o' if markers else None, label=y_col)
-        
-        ax.set_xlabel(x, fontsize=12)
-        ax.set_ylabel('Value', fontsize=12)
-        ax.set_title('Time Series Plot', fontsize=14, fontweight='bold')
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-        plt.xticks(rotation=45, ha='right')
-        plt.tight_layout()
-        
-        if save_path:
-            fig.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"✓ Saved: {save_path}")
-        
-        return fig
-    
-    def plot_multiple_distributions(self, columns: List[str],
-                                   save_path: Optional[str] = None) -> plt.Figure:
-        """Plot multiple distributions in subplots"""
-        n_cols = len(columns)
-        n_rows = (n_cols + 2) // 3
-        
-        fig, axes = plt.subplots(n_rows, 3, figsize=(15, 5*n_rows))
-        axes = axes.flatten() if n_rows > 1 else [axes]
-        
-        for idx, col in enumerate(columns):
-            if pd.api.types.is_numeric_dtype(self.data[col]):
-                self.data[col].hist(bins=30, ax=axes[idx], alpha=0.7, edgecolor='black')
-                axes[idx].set_title(col, fontweight='bold')
-                axes[idx].set_ylabel('Frequency')
-                axes[idx].grid(True, alpha=0.3)
-        
-        # Hide unused subplots
-        for idx in range(len(columns), len(axes)):
-            axes[idx].set_visible(False)
-        
-        plt.suptitle('Distribution Analysis', fontsize=16, fontweight='bold', y=1.00)
-        plt.tight_layout()
-        
-        if save_path:
-            fig.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"✓ Saved: {save_path}")
-        
-        return fig
+            plt.savefig(save_path)
+            print(f"Saved plot to {save_path}")
+        plt.close()
